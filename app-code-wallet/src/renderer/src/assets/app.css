@@ -1,9 +1,13 @@
-/* Global styles */
+/* app.css */
+/* This file contains the global styles for the Code Wallet application. */
+
+/* Global styles for the body */
 body {
   margin: 0;
   font-family: 'Montserrat', Arial, sans-serif;
 }
 
+/* Header styles */
 header {
   display: flex;
   justify-content: space-between;
@@ -11,14 +15,15 @@ header {
   padding: 20px;
   background-color: #333;
   color: white;
- 
 }
 
+/* Navigation bar styles */
 nav {
   display: flex;
   align-items: center;
 }
 
+/* Navigation links and buttons */
 nav a, nav button {
   color: white;
   text-decoration: none;
@@ -29,37 +34,34 @@ nav a, nav button {
   cursor: pointer;
 }
 
-
-
+/* Logo styles */
 .logo {
   font-size: 1.5em;
   font-weight: bold;
 }
 
-/* Titres principaux en semi-bold et taille adaptée */
+/* Main titles (h2, etc.) */
 h2, .main-title, .section-title {
   font-size: 2.1em;
   font-weight: 600;
   letter-spacing: -0.5px;
   margin-bottom: 0.7em;
- 
 }
 
-/* Titres secondaires (ex: Mots clés, Informations) */
+/* Secondary titles (h3, subtitles, etc.) */
 h3, .subtitle, .info-title, .keywords-title {
   font-size: 1.3em;
   font-weight: bold;
   margin-bottom: 0.5em;
 }
 
-/* Pour le bouton Mode Sombre si besoin */
+/* Dark mode button styles */
 .mode-dark-btn {
   font-weight: 600;
   font-size: 1.05em;
-  
 }
 
-/* Responsive styles */
+/* Responsive styles for different screen sizes */
 @media (max-width: 1200px) {
   nav {
     padding: 15px 10px !important;
