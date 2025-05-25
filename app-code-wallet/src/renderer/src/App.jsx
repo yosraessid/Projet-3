@@ -1,47 +1,72 @@
-import React from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import FragmentsPage from './components/FragmentsPage.jsx';
-import FragmentFormPage from './components/FragmentFormPage.jsx';
-import TagsPage from './components/TagsPage.jsx';
-import InfoPage from './components/InfoPage.jsx';
-import CodeModal from './components/CodeModal.jsx';
-import Header from './components/Header.jsx';
-import './assets/app.css';
+// App.jsx
+// This is the main component of the application. It manages the global state (fragments, tags, dark mode),
+// handles data persistence (saving/loading), and sets up the main routes and layout.
 
-const Store = window.electron?.store;
+import React from 'react'; // Import React
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Import routing tools
+import FragmentsPage from './components/FragmentsPage.jsx'; // Import the page for code snippets
+import FragmentFormPage from './components/FragmentFormPage.jsx'; // Import the page for creating/editing a snippet
+import TagsPage from './components/TagsPage.jsx'; // Import the page for tags
+import InfoPage from './components/InfoPage.jsx'; // Import the info/about page
+import CodeModal from './components/CodeModal.jsx'; // Import the modal for viewing code
+import Header from './components/Header.jsx'; // Import the header/navigation bar
+import './assets/app.css'; // Import global styles
+
+// Detect if running in Electron or in the browser
+const isElectron = Boolean(window.electron?.store);
+
+// Utility functions for browser storage (localStorage)
+const browserStore = {
+  get: (key) => {
+    try {
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : (key === 'darkMode' ? false : []);
+    } catch {
+      return key === 'darkMode' ? false : [];
+    }
+  },
+  set: (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+};
+
+// Use Electron store if available, otherwise use browser storage
+const Store = isElectron ? window.electron.store : browserStore;
 
 function App() {
-  const [fragments, setFragments] = React.useState([]);
-  const [tags, setTags] = React.useState([]);
+  // State for code fragments (snippets)
+  const [fragments, setFragments] = React.useState(() => Store.get('fragments') || []);
+  // State for tags
+  const [tags, setTags] = React.useState(() => Store.get('tags') || []);
+  // State for code modal (content and visibility)
   const [modalCode, setModalCode] = React.useState('');
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [darkMode, setDarkMode] = React.useState(() => {
-    return Store?.get('darkMode') || false;
-  });
+  // State for dark mode
+  const [darkMode, setDarkMode] = React.useState(() => Store.get('darkMode') || false);
 
-  // Chargement initial depuis le store
+  // On mount: reload data from storage (to avoid losing data after refresh)
   React.useEffect(() => {
-    const storedFragments = Store?.get('fragments') || [];
-    const storedTags = Store?.get('tags') || [];
-    setFragments(storedFragments);
-    setTags(storedTags);
+    setFragments(Store.get('fragments') || []);
+    setTags(Store.get('tags') || []);
   }, []);
 
-  // Sauvegarde dans le store à chaque modification
+  // Save fragments to storage whenever they change
   React.useEffect(() => {
-    Store?.set('fragments', fragments);
+    Store.set('fragments', fragments);
   }, [fragments]);
 
+  // Save tags to storage whenever they change
   React.useEffect(() => {
-    Store?.set('tags', tags);
+    Store.set('tags', tags);
   }, [tags]);
 
+  // Save dark mode preference and update body class
   React.useEffect(() => {
     document.body.classList.toggle('dark-mode', darkMode);
-    Store?.set('darkMode', darkMode);
+    Store.set('darkMode', darkMode);
   }, [darkMode]);
 
-  // --- Raccourcis clavier globaux ---
+  // Keyboard shortcuts for navigation and focus
   React.useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.key === 'n') {
@@ -66,35 +91,40 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Open the code modal with given code
   const openCodeModal = (code) => {
     setModalCode(code);
     setIsModalOpen(true);
   };
 
+  // Close the code modal
   const closeCodeModal = () => {
     setIsModalOpen(false);
     setModalCode('');
   };
 
+  // Add or edit a fragment (snippet)
   const addOrEditFragment = (fragmentData) => {
     setFragments(prevFragments => {
       const existingFragmentIndex = prevFragments.findIndex(frag => frag.id === fragmentData.id);
       const updatedFragments = existingFragmentIndex > -1
         ? prevFragments.map(frag => frag.id === fragmentData.id ? fragmentData : frag)
         : [...prevFragments, fragmentData];
-      Store?.set('fragments', updatedFragments);
+      Store.set('fragments', updatedFragments);
       return updatedFragments;
     });
   };
 
+  // Delete a fragment (snippet)
   const deleteFragment = (id) => {
     setFragments(prevFragments => {
       const updatedFragments = prevFragments.filter(frag => frag.id !== id);
-      Store?.set('fragments', updatedFragments);
+      Store.set('fragments', updatedFragments);
       return updatedFragments;
     });
   };
 
+  // Add a new tag
   const addTag = (tagData) => {
     if (!tagData || !tagData.name) return;
     setTags(prevTags => {
@@ -103,57 +133,59 @@ function App() {
         name: tagData.name
       };
       const updatedTags = [...prevTags, newTag];
-      Store?.set('tags', updatedTags);
+      Store.set('tags', updatedTags);
       return updatedTags;
     });
   };
 
+  // Edit an existing tag
   const editTag = (updatedTag) => {
     setTags(prevTags => {
       const updatedTags = prevTags.map(tag => tag.id === updatedTag.id ? updatedTag : tag);
-      Store?.set('tags', updatedTags);
+      Store.set('tags', updatedTags);
       return updatedTags;
     });
   };
 
+  // Delete a tag
   const deleteTag = (id) => {
     setTags(prevTags => {
       const updatedTags = prevTags.filter(tag => tag.id !== id);
-      Store?.set('tags', updatedTags);
+      Store.set('tags', updatedTags);
       return updatedTags;
     });
-    
-    // Supprime également le tag des fragments qui l'utilisent
+    // Also remove the tag from all fragments
     setFragments(prevFragments => {
       const updatedFragments = prevFragments.map(fragment => ({
         ...fragment,
         tags: fragment.tags.filter(tagId => tagId !== id)
       }));
-      Store?.set('fragments', updatedFragments);
+      Store.set('fragments', updatedFragments);
       return updatedFragments;
     });
   };
 
+  // Navigation helpers (not used but can be implemented)
   const navigateToEdit = (frag) => {
-    // navigation à implémenter si besoin
+    // navigation to edit page if needed
   };
-
   const navigateToNewForm = () => {
-    // navigation à implémenter si besoin
+    // navigation to new form if needed
   };
 
+  // Render the main layout and routes
   return (
     <Router>
       <div
         style={{ minHeight: '100vh', background: darkMode ? '#18191a' : '#f5f5f5', color: darkMode ? '#f5f5f5' : '#222' }}
-        // Drag & Drop handler
+        // Drag & Drop handler for loading code from a file
         onDragOver={e => e.preventDefault()}
         onDrop={async e => {
           e.preventDefault();
           const file = e.dataTransfer.files[0];
           if (file && file.type === 'text/plain') {
             const text = await file.text();
-            // Naviguer vers le formulaire avec le contenu du fichier
+            // Navigate to the form page with the file content
             window.location.hash = `#/form?code=${encodeURIComponent(text)}`;
           }
         }}
@@ -188,4 +220,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; // Export the main App component

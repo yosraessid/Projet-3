@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 
+// FragmentFormPage.jsx
+// This page provides a form to create or edit a code snippet (fragment).
+// It handles the form state, saving, and deleting of fragments.
+
 function FragmentFormPage({ tags = [], onAddOrEditFragment, onDeleteFragment }) {
   const navigate = useNavigate();
   const location = useLocation();

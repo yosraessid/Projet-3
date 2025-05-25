@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react'; // Importer useState si le mode sombre était géré ici
 import PropTypes from 'prop-types';
 
+// Header.jsx
+// This component displays the top navigation bar with links and a dark mode toggle button.
+
 function Header({ darkMode, setDarkMode }) {
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);

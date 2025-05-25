@@ -1,3 +1,7 @@
+// TagsPage.jsx
+// This page allows the user to view, create, edit, and delete tags for code snippets.
+// It manages the tag list and the modal for editing/creating tags.
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import TagEditModal from './TagEditModal';

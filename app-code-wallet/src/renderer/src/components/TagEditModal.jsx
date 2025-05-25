@@ -1,3 +1,6 @@
+// TagEditModal.jsx
+// This modal allows the user to create or edit a tag. It manages the form state and handles save/delete actions.
+
 import React, { useState } from 'react';
 
 function TagEditModal({ tag, onClose, onSave, onDelete }) {

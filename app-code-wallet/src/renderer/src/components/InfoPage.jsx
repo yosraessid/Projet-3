@@ -1,3 +1,6 @@
+// InfoPage.jsx
+// This page displays information about the application: features, developer info, and legal information.
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 

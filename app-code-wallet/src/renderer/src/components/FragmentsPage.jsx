@@ -1,6 +1,10 @@
 import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router-dom'
 
+// FragmentsPage.jsx
+// This page displays the list of code snippets (fragments) and allows navigation to create, edit, or view details.
+// It also shows tags associated with each fragment.
+
 function FragmentsPage({ fragments, tags, openCodeModal }) {
   const navigate = useNavigate()
 

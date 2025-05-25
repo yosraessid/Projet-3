@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+// CodeModal.jsx
+// This modal displays the code of a snippet and allows the user to copy it to the clipboard.
+
 function CodeModal({ code, isOpen, onClose, darkMode }) {
   if (!isOpen) return null;
 
